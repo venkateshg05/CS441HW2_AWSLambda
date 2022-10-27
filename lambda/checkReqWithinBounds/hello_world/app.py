@@ -1,6 +1,7 @@
 import json
 import boto3
 from datetime import datetime as dt
+from datetime import timedelta
 
 
 # def get_file(fname):
@@ -8,7 +9,7 @@ from datetime import datetime as dt
 #     logFile = logFileObject['Body'].read().decode('utf-8')
 #     return logFile
 
-def check_within_bounds(start_idx, end_idx, search_time, timestamps):
+def get_log_file_idx(start_idx, end_idx, search_time, timestamps):
 
     # Calculate mid for binary search
 
@@ -36,13 +37,18 @@ def check_within_bounds(start_idx, end_idx, search_time, timestamps):
         return mid_idx
     # Else continue binary search
     elif search_ts < mid_ts:
-        return check_within_bounds(start_idx, mid_idx-1, search_time, timestamps)
+        return get_log_file_idx(start_idx, mid_idx-1, search_time, timestamps)
     else:
-        return check_within_bounds(mid_idx+1, end_idx, search_time, timestamps)
+        return get_log_file_idx(mid_idx+1, end_idx, search_time, timestamps)
 
 
 def get_time_stamps(s3_bucket):
-    return [file.key.split("_")[-1][:5] for file in s3_bucket.objects.all()]
+    return [file.key.split(".")[1] for file in s3_bucket.objects.all()]
+
+
+def get_end_time(start_time, time_delta):
+    start_time = dt.strptime(start_time, "%H-%M")
+    return (start_time + timedelta(minutes=int(time_delta))).strftime("%H-%M")
 
 
 def lambda_handler(event, context):
@@ -67,12 +73,26 @@ def lambda_handler(event, context):
     s3_bucket = s3.Bucket(bucket)
 
     time_stamps = get_time_stamps(s3_bucket)
-    print(check_within_bounds(0, len(time_stamps)-1, "12-12", time_stamps))
+    log_file_start_idx = get_log_file_idx(0, len(time_stamps)-1,
+                                          event["start_time"], time_stamps)
+
+    end_time = get_end_time(event["start_time"], event["time_delta"])
+    log_file_end_idx = get_log_file_idx(0, len(time_stamps)-1,
+                                        end_time, time_stamps)
+
+    if log_file_start_idx == "Not found" or log_file_end_idx == "Not found":
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": "Did not found log files for the given time range"
+            }),
+        }
 
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": "hello world",
-            # "location": ip.text.replace("\n", "")
+            "message": "Found log files for the given time range",
+            "log_files_start_idx": f"{log_file_start_idx}",
+            "log_files_end_idx": f"{log_file_end_idx}",
         }),
     }
