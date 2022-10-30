@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service LogsProcessor {
+    rpc CheckLogsExists (TimeWindow) returns (LambdaResult) {}
+}
+
+message TimeWindow {
+    string startTime = 1;
+    string timeDelta = 2;
+}
+
+
+message LambdaResult {
+    string message = 1;
+}
