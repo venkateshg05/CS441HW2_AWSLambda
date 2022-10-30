@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "getLogs"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1x2j6b2i10l9t"
+s3_prefix = "getLogs"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
