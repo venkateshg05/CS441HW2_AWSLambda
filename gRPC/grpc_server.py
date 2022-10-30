@@ -1,6 +1,7 @@
 from concurrent import futures
 import logging
 
+import requests
 import grpc
 import log_processor_lambda_pb2
 import log_processor_lambda_pb2_grpc
@@ -9,8 +10,12 @@ import log_processor_lambda_pb2_grpc
 class LogProcessor(log_processor_lambda_pb2_grpc.LogsProcessorServicer):
 
     def CheckLogsExists(self, request, context):
+        url = 'https://iglc5ilpn7.execute-api.us-east-1.amazonaws.com/Prod/checktimewithinbounds'
+        data = {'start_time': request.startTime,
+                'time_delta': request.timeDelta}
+        x = requests.post(url, json=data)
         return log_processor_lambda_pb2.LambdaResult(
-            message=f"start_time: {request.startTime}, delta: {request.timeDelta}"
+            message=x.text
         )
 
 
