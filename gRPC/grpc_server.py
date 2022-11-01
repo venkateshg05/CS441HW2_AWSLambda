@@ -8,6 +8,15 @@ from HelperUtils.create_logger import create_logger
 
 class LogProcessor(log_processor_lambda_pb2_grpc.LogsProcessorServicer):
 
+    """
+    gets the request from the grpc client
+    unmarshalls the protobuf data
+    makes an API call to the Lambda on AWS
+    gets the result from the Lambda
+    marshalls the result into a protobuf object
+    sends the response object back to the client
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.logger = create_logger(__name__)
@@ -26,6 +35,10 @@ class LogProcessor(log_processor_lambda_pb2_grpc.LogsProcessorServicer):
 
 
 def serve():
+    """
+    sets up the grpc server on port 50051
+    listens for the client requests
+    """
     port = '50051'
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     log_processor_lambda_pb2_grpc.add_LogsProcessorServicer_to_server(
