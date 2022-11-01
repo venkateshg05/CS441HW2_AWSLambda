@@ -71,12 +71,15 @@ def lambda_handler(event, context):
     s3 = boto3.resource('s3', aws_access_key_id="AKIAVA6CVFWCE57KTAWS",
                         aws_secret_access_key="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")
     s3_bucket = s3.Bucket(bucket)
+    payload = json.loads(event['body'])
+    start_time = payload["start_time"]
+    time_delta = payload["time_delta"]
 
     time_stamps = get_time_stamps(s3_bucket)
     log_file_start_idx = get_log_file_idx(0, len(time_stamps)-1,
-                                          event["start_time"], time_stamps)
+                                          start_time, time_stamps)
 
-    end_time = get_end_time(event["start_time"], event["time_delta"])
+    end_time = get_end_time(start_time, time_delta)
     log_file_end_idx = get_log_file_idx(0, len(time_stamps)-1,
                                         end_time, time_stamps)
 
@@ -87,9 +90,6 @@ def lambda_handler(event, context):
                 "message": "Did not found log files for the given time range"
             }),
         }
-
-    print([file.key for file in s3_bucket.objects.all()
-          [log_file_start_idx:log_file_end_idx+1]])
 
     return {
         "statusCode": 200,
