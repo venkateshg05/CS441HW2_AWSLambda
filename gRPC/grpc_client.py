@@ -1,10 +1,11 @@
 from __future__ import print_function
-
-import logging
-
-import grpc
-import log_processor_lambda_pb2
 import log_processor_lambda_pb2_grpc
+import log_processor_lambda_pb2
+import grpc
+
+from HelperUtils.create_logger import create_logger
+
+logger = create_logger(__name__)
 
 
 def run():
@@ -16,9 +17,8 @@ def run():
                 startTime='22-45', timeDelta='5'
             )
         )
-    print("Greeter client received: " + response.message)
+    logger.info(f"Greeter client received: {response.message}")
 
 
 if __name__ == '__main__':
-    logging.basicConfig()
     run()
