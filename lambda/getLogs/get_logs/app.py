@@ -3,17 +3,20 @@ import boto3
 from datetime import datetime as dt
 from datetime import timedelta
 
+from HelperUtils.create_logger import create_logger
+
+logger = create_logger(__name__)
+ts_format = "%H-%M"
 
 # def get_file(fname):
 #     logFileObject = list(filter(lambda f: f.key == fname, my_bucket.objects.all()))[0].get()
 #     logFile = logFileObject['Body'].read().decode('utf-8')
 #     return logFile
 
+
 def get_log_file_idx(start_idx, end_idx, search_time, timestamps):
 
     # Calculate mid for binary search
-
-    ts_format = "%H-%M"  # TO CONFIG
     total = start_idx + end_idx
     mid_idx = total//2
 
@@ -25,6 +28,7 @@ def get_log_file_idx(start_idx, end_idx, search_time, timestamps):
     search_ts = dt.strptime(search_time, ts_format)
 
     # if reach boundaries
+    logger.warn(f"search_time: {search_time} not in timestamps")
     if start_idx >= end_idx:
         if search_ts == start_ts:
             return start_idx
@@ -43,12 +47,20 @@ def get_log_file_idx(start_idx, end_idx, search_time, timestamps):
 
 
 def get_time_stamps(s3_bucket):
-    return [file.key.split(".")[1] for file in s3_bucket.objects.all()]
+    try:
+        files = s3_bucket.objects.all()
+    except Exception as e:
+        logger.exception("Issue with s3 bucket")
+
+    return [file.key.split(".")[1] for file in files]
 
 
 def get_end_time(start_time, time_delta):
-    start_time = dt.strptime(start_time, "%H-%M")
-    return (start_time + timedelta(minutes=int(time_delta))).strftime("%H-%M")
+    try:
+        start_time = dt.strptime(start_time, ts_format)
+    except Exception as e:
+        logger.exception("Incorrect string format for timestamp")
+    return (start_time + timedelta(minutes=int(time_delta))).strftime(ts_format)
 
 
 def lambda_handler(event, context):
@@ -67,10 +79,13 @@ def lambda_handler(event, context):
     """
 
     bucket = "cs441-hw2-data"  # TO CONFIG
-    # This file will be read to get the logs
-    s3 = boto3.resource('s3', aws_access_key_id="AKIAVA6CVFWCE57KTAWS",
-                        aws_secret_access_key="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")
-    s3_bucket = s3.Bucket(bucket)
+    try:
+        s3 = boto3.resource('s3', aws_access_key_id="AKIAVA6CVFWCE57KTAWS",
+                            aws_secret_access_key="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")
+        s3_bucket = s3.Bucket(bucket)
+    except Exception as e:
+        logger.exception("Issue with accessing S3")
+
     payload = json.loads(event['body'])
     start_time = payload["start_time"]
     time_delta = payload["time_delta"]
