@@ -7,13 +7,13 @@ from HelperUtils.create_logger import create_logger
 
 logger = create_logger(__name__)
 ts_format = "%H-%M"
-# def get_file(fname):
-#     logFileObject = list(filter(lambda f: f.key == fname, my_bucket.objects.all()))[0].get()
-#     logFile = logFileObject['Body'].read().decode('utf-8')
-#     return logFile
 
 
 def get_log_file_idx(start_idx, end_idx, search_time, timestamps):
+    """
+    for the given search time & timestamps,
+    returns the index of the search time in timestamps
+    """
 
     # Calculate mid for binary search
     total = start_idx + end_idx
@@ -46,6 +46,9 @@ def get_log_file_idx(start_idx, end_idx, search_time, timestamps):
 
 
 def get_time_stamps(s3_bucket):
+    """
+    extracts the time stamps in the log files on given S3 bucket
+    """
     try:
         files = s3_bucket.objects.all()
     except Exception as e:
@@ -55,6 +58,9 @@ def get_time_stamps(s3_bucket):
 
 
 def get_end_time(start_time, time_delta):
+    """
+    calculates the upper bound of the requested window
+    """
     try:
         start_time = dt.strptime(start_time, ts_format)
     except Exception as e:
