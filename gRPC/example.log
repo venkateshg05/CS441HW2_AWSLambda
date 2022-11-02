@@ -40,3 +40,9 @@
 2022-11-02 05:59:56,591 - __main__ - INFO - Setup logger!
 2022-11-02 06:00:27,701 - __main__ - INFO - Setup logger!
 2022-11-02 06:00:28,342 - __main__ - INFO - S3 response: {"message": "Found log files for the given time range", "log_files_start_idx": "7", "log_files_end_idx": "12"}
+2022-11-02 06:05:02,045 - __main__ - INFO - Setup logger!
+2022-11-02 06:05:02,610 - __main__ - INFO - S3 response: {"message": "Internal server error"}
+2022-11-02 06:05:26,118 - __main__ - INFO - Setup logger!
+2022-11-02 06:05:26,570 - __main__ - INFO - S3 response: {"message": "Internal server error"}
+2022-11-02 06:05:54,046 - __main__ - INFO - Setup logger!
+2022-11-02 06:05:54,909 - __main__ - INFO - S3 response: {"message": "Found log files for the given time range", "log_files_start_idx": "2", "log_files_end_idx": "7"}

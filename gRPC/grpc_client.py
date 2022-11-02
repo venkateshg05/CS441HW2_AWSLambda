@@ -3,6 +3,7 @@ import log_processor_lambda_pb2_grpc
 import log_processor_lambda_pb2
 import grpc
 import configparser
+import sys
 
 from HelperUtils.create_logger import create_logger
 
@@ -31,4 +32,7 @@ def run(startTime='22-45', timeDelta='5'):
 
 
 if __name__ == '__main__':
-    run()
+    try:
+        run(sys.argv[1], sys.argv[2])
+    except Exception as e:
+        logger.exception("Expected 2 cmd line args")
