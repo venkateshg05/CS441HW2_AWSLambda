@@ -22,7 +22,7 @@ class LogProcessor(log_processor_lambda_pb2_grpc.LogsProcessorServicer):
         self.logger = create_logger(__name__)
 
     def CheckLogsExists(self, request, context):
-        url = 'https://iglc5ilpn7.execute-api.us-east-1.amazonaws.com/Prod/checktimewithinbounds'
+        url = "https://apm60019xa.execute-api.us-east-1.amazonaws.com/Prod/checklogsexist"
         data = {'start_time': request.startTime,
                 'time_delta': request.timeDelta}
         try:

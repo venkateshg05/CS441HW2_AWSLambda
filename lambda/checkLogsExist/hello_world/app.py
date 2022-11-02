@@ -3,7 +3,7 @@ import boto3
 from datetime import datetime as dt
 from datetime import timedelta
 
-from HelperUtils.create_logger import create_logger
+from create_logger import create_logger
 
 logger = create_logger(__name__)
 ts_format = "%H-%M"
@@ -27,12 +27,12 @@ def get_log_file_idx(start_idx, end_idx, search_time, timestamps):
     search_ts = dt.strptime(search_time, ts_format)
 
     # if reach boundaries
-    logger.warn(f"search_time: {search_time} not in timestamps")
     if start_idx >= end_idx:
         if search_ts == start_ts:
             return start_idx
         if search_ts == end_ts:
             return end_idx
+        logger.warn(f"search_time: {search_time} not in timestamps")
         return "Not found"
     # If the time interval found, return the index
     # - this will be the index of the file to search
@@ -97,15 +97,25 @@ def lambda_handler(event, context):
     start_time = payload["start_time"]
     time_delta = payload["time_delta"]
 
+    # start_time = event["start_time"]
+    # time_delta = event["time_delta"]
+
     time_stamps = get_time_stamps(s3_bucket)
     log_file_start_idx = get_log_file_idx(0, len(time_stamps)-1,
                                           start_time, time_stamps)
 
+    if log_file_start_idx == "Not found":
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": "Did not found log files for the given time range"
+            }),
+        }
     end_time = get_end_time(start_time, time_delta)
     log_file_end_idx = get_log_file_idx(0, len(time_stamps)-1,
                                         end_time, time_stamps)
 
-    if log_file_start_idx == "Not found" or log_file_end_idx == "Not found":
+    if log_file_end_idx == "Not found":
         return {
             "statusCode": 400,
             "body": json.dumps({
