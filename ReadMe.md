@@ -2,7 +2,7 @@ Venkatesh Gopalakrishnan (UIN: 655290219)
 
 AWS Lambda APIs that processes log files on S3.
 
-YouTube Documentation url: 
+YouTube Documentation url: https://youtu.be/P3bqwA8H5rg
 
 This project has two components to it:
   1) The Lambdas (FAAS) on AWS that processes the log files on an S3 storage
