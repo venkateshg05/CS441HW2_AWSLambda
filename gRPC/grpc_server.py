@@ -3,6 +3,7 @@ import log_processor_lambda_pb2
 import grpc
 import requests
 from concurrent import futures
+import configparser
 from HelperUtils.create_logger import create_logger
 
 
@@ -20,9 +21,11 @@ class LogProcessor(log_processor_lambda_pb2_grpc.LogsProcessorServicer):
     def __init__(self) -> None:
         super().__init__()
         self.logger = create_logger(__name__)
+        self.config = configparser.ConfigParser()
+        self.config.read("app_conf.ini")
 
     def CheckLogsExists(self, request, context):
-        url = "https://apm60019xa.execute-api.us-east-1.amazonaws.com/Prod/checklogsexist"
+        url = self.config['DEFAULT']['aws_api_url']
         data = {'start_time': request.startTime,
                 'time_delta': request.timeDelta}
         try:
@@ -39,8 +42,11 @@ def serve():
     sets up the grpc server on port 50051
     listens for the client requests
     """
-    port = '50051'
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    config = configparser.ConfigParser()
+    config.read("app_conf.ini")
+    port = config['DEFAULT']['port']
+    max_workers = int(config['DEFAULT']['max_workers'])
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     log_processor_lambda_pb2_grpc.add_LogsProcessorServicer_to_server(
         LogProcessor(), server
     )
