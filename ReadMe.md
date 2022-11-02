@@ -28,15 +28,15 @@ This project has two components to it:
   2) define the protobuf structure for the client & server comm. in a .proto file
   3) generate the stubs required to achieve the protobuf communication between the client & server
   4) define the server functionality in the grpc_server.py. The class LogProcessor connects to the lambda API & exposes the ip:port for the client to connect
-  5) define the client functionality in the grpc_client.py. The client connects to the server ip and using the generated client stub, it connects to the server & passes the required parameters (start_time & time_delta)
+  5) define the client functionality in the grpc_client.py. The client connects to the server ip and using the generated client stub, it connects to the server & passes the required parameters (start_time & time_delta). These two args are given as command line args when running the client.py file in the same order
   6) The server receives the parameters, unmarshalls them and does a HTTP call to the lambda API
   7) The lambda API returns whether the log files exist for the given time window
   
- HTTP:
-  The HTTP way of accessing the lambda API to retreive md5 checksum of the log files is realised using Akka HTTP framework.
-  The Akka client is implemented in this repo: https://github.com/venkateshg05/AkkaHttpClient.git
-  Below is the functionality of this HTTP client:
-    1) Input: Gets the start_time & time delta as command line args (in that order)
-    2) Connects to the lambda API on AWS
-    3) Requests the logs between the start_time & time_delta as HTTP POST request
-    4) Prints the results from the lambda
+HTTP:
+ The HTTP way of accessing the lambda API to retreive md5 checksum of the log files is realised using Akka HTTP framework.
+ The Akka client is implemented in this repo: https://github.com/venkateshg05/AkkaHttpClient.git
+ Below is the functionality of this HTTP client:
+   1) Input: Gets the start_time & time delta as command line args (in that order)
+   2) Connects to the lambda API on AWS
+   3) Requests the logs between the start_time & time_delta as HTTP POST request
+   4) Prints the results from the lambda
