@@ -87,8 +87,8 @@ def lambda_handler(event, context):
     bucket = "cs441-hw2-data"  # TO CONFIG
 
     try:
-        s3 = boto3.resource('s3', aws_access_key_id="AKIAVA6CVFWCE57KTAWS",
-                            aws_secret_access_key="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")
+        s3 = boto3.resource('s3', aws_access_key_id="",
+                            aws_secret_access_key="")
         s3_bucket = s3.Bucket(bucket)
     except Exception as e:
         logger.exception("Issue with accessing S3")
